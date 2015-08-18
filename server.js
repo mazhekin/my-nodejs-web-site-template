@@ -1,45 +1,18 @@
 var express = require('express');
-var path = require('path');
-var stylus = require('stylus');
-var morgan = require('morgan');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
 var url = require('url');
+var path = require('path');
 
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 var app = express();
 
-function compile(str, path) {
-    return stylus(str).set('filename ', path);
-}
+var config = require('./server/config/config')['production'];
 
-app.set('views', path.join(__dirname, 'server/views'));
-app.set('view engine', 'jade');
-app.use(morgan('dev')); // log every request to the console
-app.use(bodyParser.json());
-app.use(stylus.middleware({
-    src: __dirname + '/public',
-    compile: compile
-}));
-app.use(express.static(__dirname + '/public'));
+require('./server/config/express')(app, config);
 
-mongoose.connect('mongodb://wasya:mymongodb@ds033390.mongolab.com:33390/mymongodb');
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error...'));
-db.once('open',function callback() {
-    console.log('my db opened on mongolab');
-});
+require('./server/config/mongoose')(config);
 
+require('./server/config/routes')(app);
 
-app.get('/partials/*', function(req, res) {
-    res.render('../../public/app/' + req.url.substr(9));
-});
-
-app.get('*', function(req, res) {
-    res.render('index');
-});
-
-var port = process.env.PORT || 3000;
-app.listen(port);
-console.log('Listening on port ' + port + '...');
+app.listen(config.port);
+console.log('Listening on port ' + config.port + '...');
