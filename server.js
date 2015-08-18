@@ -3,7 +3,8 @@ var path = require('path');
 var stylus = require('stylus');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
-var  mongoose = require('mongoose');
+var mongoose = require('mongoose');
+var url = require('url');
 
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -31,8 +32,8 @@ db.once('open',function callback() {
 });
 
 
-app.get('/partials/:partialPath', function(req, res) {
-    res.render('partials/' + req.params.partialPath);
+app.get('/partials/*', function(req, res) {
+    res.render('../../public/app/' + req.url.substr(9));
 });
 
 app.get('*', function(req, res) {
