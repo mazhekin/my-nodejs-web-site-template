@@ -1,6 +1,4 @@
 var express = require('express');
-var url = require('url');
-var path = require('path');
 
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
